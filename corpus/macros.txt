@@ -64,34 +64,34 @@ a!($a $a:ident $($a);*);
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(binary_expression
-	  (unary_expression
-	    (identifier))
-	  (MISSING identifier)))))
+        (binary_expression
+          (unary_expression
+            (identifier))
+          (MISSING identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(binary_expression
-	  (reference_expression
-	    (identifier))
-	  (MISSING identifier)))))
+        (binary_expression
+          (reference_expression
+            (identifier))
+          (MISSING identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(binary_expression
-	  (unary_expression
-	    (identifier))
-	  (MISSING identifier)))))
+        (binary_expression
+          (unary_expression
+            (identifier))
+          (MISSING identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(binary_expression
-	  (identifier)
-	  (identifier))
-	(ERROR))))
+        (binary_expression
+          (identifier)
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
@@ -103,15 +103,15 @@ a!($a $a:ident $($a);*);
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(range_expression
-	  (char_literal)
-	  (char_literal)))))
+        (range_expression
+          (char_literal)
+          (char_literal)))))
   (macro_invocation
     (identifier)
     (macro_invocation_contents
       (ERROR
-	(loop_label
-	  (identifier)))))
+        (loop_label
+          (identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
@@ -126,43 +126,43 @@ a!($a $a:ident $($a);*);
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(ERROR))))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(ERROR)
-	(unit_expression))))
+        (ERROR)
+        (unit_expression))))
   (expression_statement
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(ERROR)
-	(identifier)
-	(ERROR))))
+        (ERROR)
+        (identifier)
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(ERROR)
-	(block
-	  (ERROR)
-	  (parenthesized_expression
-	    (array_expression
-	      (identifier)))))))
+        (ERROR)
+        (block
+          (ERROR)
+          (parenthesized_expression
+            (array_expression
+              (identifier)))))))
   (expression_statement
     (macro_invocation
       (identifier)
       (macro_invocation_contents
-	(binary_expression
-	  (call_expression
-	    (metavariable)
-	    (ERROR
-	      (metavariable))
-	    (arguments
-	      (metavariable)))
-	  (ERROR)
-	  (MISSING identifier))))))
+        (binary_expression
+          (call_expression
+            (metavariable)
+            (ERROR
+              (metavariable))
+            (arguments
+              (metavariable)))
+          (ERROR)
+          (MISSING identifier))))))
 
 ================================================================================
 Macro invocation with comments
@@ -286,3 +286,48 @@ macro_rules! zero_or_one {
       right: (token_tree
         (token_repetition
           (metavariable))))))
+
+================================================================================
+Macro invocation - expression "arguments"
+================================================================================
+
+println!(some.method(), a + b);
+let x = vec![
+  some_function(and, args),
+  nested!(here.they(are)),
+];
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (expression_statement
+    (macro_invocation
+      (identifier)
+      (macro_invocation_contents
+        (call_expression
+          (field_expression
+            (identifier)
+            (field_identifier))
+          (arguments))
+        (binary_expression
+          (identifier)
+          (identifier)))))
+  (let_declaration
+    (identifier)
+    (macro_invocation
+      (identifier)
+      (macro_invocation_contents
+        (call_expression
+          (identifier)
+          (arguments
+            (identifier)
+            (identifier)))
+        (macro_invocation
+          (identifier)
+          (macro_invocation_contents
+            (call_expression
+              (field_expression
+                (identifier)
+                (field_identifier))
+              (arguments
+                (identifier)))))))))
