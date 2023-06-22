@@ -889,7 +889,31 @@ module.exports = grammar({
         $._reserved_identifier,
       )),
       '!',
-      alias($.delim_token_tree, $.token_tree)
+      $.macro_invocation_contents,
+    ),
+
+    macro_invocation_contents: $ => choice(
+      $._macro_invocation_contents_parentheses,
+      $._macro_invocation_contents_square_brackets,
+      seq('{', repeat($._delim_tokens), '}'),
+    ),
+
+    _macro_invocation_contents_square_brackets: $ => seq(
+      '[',
+      seq(
+        sepBy(',', $._expression),
+        optional(',')
+      ),
+      ']'
+    ),
+
+    _macro_invocation_contents_parentheses: $ => seq(
+      '(',
+      seq(
+        sepBy(',', $._expression),
+        optional(',')
+      ),
+      ')'
     ),
 
     delim_token_tree: $ => choice(

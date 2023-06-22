@@ -14,21 +14,21 @@ f::g::h!{};
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree)))
+      (macro_invocation_contents)))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree)))
+      (macro_invocation_contents)))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree)))
+      (macro_invocation_contents)))
   (expression_statement
     (macro_invocation
       (scoped_identifier
         (identifier)
         (identifier))
-      (token_tree)))
+      (macro_invocation_contents)))
   (expression_statement
     (macro_invocation
       (scoped_identifier
@@ -36,7 +36,7 @@ f::g::h!{};
           (identifier)
           (identifier))
         (identifier))
-      (token_tree))))
+      (macro_invocation_contents))))
 
 ================================================================================
 Macro invocation - arbitrary tokens
@@ -63,75 +63,106 @@ a!($a $a:ident $($a);*);
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier))))
+      (macro_invocation_contents
+	(binary_expression
+	  (unary_expression
+	    (identifier))
+	  (MISSING identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier))))
+      (macro_invocation_contents
+	(binary_expression
+	  (reference_expression
+	    (identifier))
+	  (MISSING identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier))))
+      (macro_invocation_contents
+	(binary_expression
+	  (unary_expression
+	    (identifier))
+	  (MISSING identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier)
-        (identifier))))
+      (macro_invocation_contents
+	(binary_expression
+	  (identifier)
+	  (identifier))
+	(ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (char_literal)
-        (char_literal))))
+          (macro_invocation_contents
+            (range_expression
+              (char_literal)
+              (char_literal)))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (char_literal)
-        (char_literal))))
+      (macro_invocation_contents
+	(range_expression
+	  (char_literal)
+	  (char_literal)))))
   (macro_invocation
     (identifier)
-    (token_tree
-      (identifier)))
+    (macro_invocation_contents
+      (ERROR
+	(loop_label
+	  (identifier)))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
+      (macro_invocation_contents
         (identifier))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
+      (macro_invocation_contents
         (identifier))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree)))
+      (macro_invocation_contents
+	(ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree (token_tree))))
+      (macro_invocation_contents
+	(ERROR)
+	(unit_expression))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree (identifier))))
+      (macro_invocation_contents
+	(ERROR)
+	(identifier)
+	(ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree (token_tree (token_tree (token_tree (identifier)))))))
+      (macro_invocation_contents
+	(ERROR)
+	(block
+	  (ERROR)
+	  (parenthesized_expression
+	    (array_expression
+	      (identifier)))))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier)
-        (identifier)
-        (identifier)
-        (token_tree
-          (identifier))))))
+      (macro_invocation_contents
+	(binary_expression
+	  (call_expression
+	    (metavariable)
+	    (ERROR
+	      (metavariable))
+	    (arguments
+	      (metavariable)))
+	  (ERROR)
+	  (MISSING identifier))))))
 
 ================================================================================
 Macro invocation with comments
@@ -147,7 +178,7 @@ ok! {
 (source_file
   (macro_invocation
     (identifier)
-    (token_tree
+    (macro_invocation_contents
       (line_comment)
       (block_comment))))
 

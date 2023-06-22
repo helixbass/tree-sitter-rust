@@ -123,7 +123,7 @@ fn accumulate(self) -> Machine<{State::Accumulate}> {}
       (expression_statement
         (macro_invocation
           macro: (identifier)
-          (token_tree
+          (macro_invocation_contents
             (string_literal)
             (identifier))))))
   (function_item
@@ -1112,7 +1112,7 @@ fn baz() {}
       (identifier)
       (macro_invocation
         (identifier)
-        (token_tree
+        (macro_invocation_contents
           (string_literal)))))
   (function_item
     (identifier)
@@ -1588,7 +1588,7 @@ pub trait A: B + C + D {
     (declaration_list
       (macro_invocation
         (identifier)
-        (token_tree))
+        (macro_invocation_contents))
       (function_signature_item
         (identifier)
         (parameters
