@@ -1587,7 +1587,8 @@ pub trait A: B + C + D {
       (type_identifier))
     (declaration_list
       (macro_invocation
-        (identifier))
+        (identifier)
+        (token_tree))
       (function_signature_item
         (identifier)
         (parameters

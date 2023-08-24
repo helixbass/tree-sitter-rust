@@ -569,6 +569,10 @@
         {
           "type": "_expression",
           "named": true
+        },
+        {
+          "type": "arrow_separated_pairs",
+          "named": true
         }
       ]
     }
@@ -579,7 +583,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "_expression",
@@ -1616,7 +1620,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "_expression",
@@ -2641,7 +2645,7 @@
     },
     "children": {
       "multiple": false,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "arrow_separated_pairs",

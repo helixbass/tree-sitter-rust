@@ -375,9 +375,11 @@ if let x!() | y!() = () {}
       condition: (let_condition
         pattern: (or_pattern
           (macro_invocation
-            macro: (identifier))
+            macro: (identifier)
+            (expressions))
           (macro_invocation
-            macro: (identifier)))
+            macro: (identifier)
+            (expressions)))
         value: (unit_expression))
       consequence: (block)))
   (line_comment)

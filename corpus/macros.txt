@@ -13,25 +13,30 @@ f::g::h!{};
 (source_file
   (expression_statement
     (macro_invocation
-      (identifier)))
+      (identifier)
+      (expressions)))
   (expression_statement
     (macro_invocation
-      (identifier)))
+      (identifier)
+      (expressions)))
   (expression_statement
     (macro_invocation
-      (identifier)))
+      (identifier)
+      (token_tree)))
   (expression_statement
     (macro_invocation
       (scoped_identifier
         (identifier)
-        (identifier))))
+        (identifier))
+      (expressions)))
   (expression_statement
     (macro_invocation
       (scoped_identifier
         (scoped_identifier
           (identifier)
           (identifier))
-        (identifier)))))
+        (identifier))
+      (token_tree))))
 
 ================================================================================
 Macro invocation - arbitrary tokens
@@ -60,30 +65,30 @@ a!($a $a:ident $($a);*);
       (identifier)
       (expressions
         (unary_expression
-          (identifier)))
-      (ERROR)))
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
       (expressions
         (reference_expression
-          (identifier)))
-      (ERROR)))
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
       (expressions
         (unary_expression
-          (identifier)))
-      (ERROR)))
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
       (expressions
         (binary_expression
           (identifier)
-          (identifier)))
-      (ERROR)))
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
@@ -158,8 +163,9 @@ ok! {
 (source_file
   (macro_invocation
     (identifier)
+    (token_tree
     (line_comment)
-    (block_comment)))
+    (block_comment))))
 
 ================================================================================
 Macro definition
@@ -310,3 +316,52 @@ let x = vec![
                 (field_identifier))
               (arguments
                 (identifier)))))))))
+
+================================================================================
+Macro invocation - arrow-separated pairs
+================================================================================
+
+foo! {
+    key => "value",
+    shorthand,
+    another_key => value(),
+}
+
+nested_arrow_separated_pairs! {
+    key => {
+        nested_key => nested_value,
+    },
+    shorthand,
+    another_key => value(),
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (string_literal))
+      (identifier)
+      (arrow_separated_pair
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (identifier)
+            (identifier))))
+      (identifier)
+      (arrow_separated_pair
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments))))))

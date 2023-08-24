@@ -1076,7 +1076,8 @@ Scoped functions with macros as types
       (scoped_identifier
         (bracketed_type
           (macro_invocation
-            (identifier)))
+            (identifier)
+            (expressions)))
         (identifier))
       (arguments))))
 
