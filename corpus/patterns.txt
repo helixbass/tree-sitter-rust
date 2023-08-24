@@ -375,11 +375,9 @@ if let x!() | y!() = () {}
       condition: (let_condition
         pattern: (or_pattern
           (macro_invocation
-            macro: (identifier)
-            (macro_invocation_contents))
+            macro: (identifier))
           (macro_invocation
-            macro: (identifier)
-            (macro_invocation_contents)))
+            macro: (identifier)))
         value: (unit_expression))
       consequence: (block)))
   (line_comment)
@@ -434,7 +432,7 @@ fn foo(x: i32) {
                 (identifier))
               value: (macro_invocation
                 macro: (identifier)
-                (macro_invocation_contents
+                (expressions
                   (string_literal))))
             (match_arm
               pattern: (match_pattern)
@@ -462,7 +460,7 @@ fn foo(x: i32) {
                         (integer_literal))))))
               value: (macro_invocation
                 macro: (identifier)
-                (macro_invocation_contents
+                (expressions
                   (string_literal))))
             (match_arm
               pattern: (match_pattern)

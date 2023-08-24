@@ -77,7 +77,7 @@ module.exports = grammar({
     [$.parameters, $._pattern],
     [$.parameters, $.tuple_struct_pattern],
     [$.type_parameters, $.for_lifetimes],
-    [$.parseable_macro_invocation_contents, $.delim_token_tree],
+    [$._parseable_macro_invocation_contents, $.delim_token_tree],
     [$._expression_except_range, $._non_delim_token],
     [$.loop_label, $._non_delim_token],
     [$.async_block, $._non_delim_token],
@@ -923,12 +923,12 @@ module.exports = grammar({
       )),
       '!',
       choice(
-        alias($.parseable_macro_invocation_contents, $.macro_invocation_contents),
+        $._parseable_macro_invocation_contents,
         alias($.delim_token_tree, $.token_tree),
       ),
     ),
 
-    parseable_macro_invocation_contents: $ => choice(
+    _parseable_macro_invocation_contents: $ => prec.dynamic(10, choice(
       seq(
         '[',
         optional(choice(
@@ -953,19 +953,27 @@ module.exports = grammar({
         )),
         '}'
       ),
-    ),
+    )),
 
     arrow_separated_pairs: $ => prec.dynamic(9, seq(
       $._expression_or_arrow_separated_pair,
-      ',',
-      sepBy(',', $._expression_or_arrow_separated_pair),
+      repeat(
+        seq(
+          ',',
+          $._expression_or_arrow_separated_pair,
+        )
+      ),
       optional(',')
     )),
 
     expressions: $ => prec.dynamic(10, seq(
       $._expression,
-      ',',
-      sepBy(',', $._expression),
+      repeat(
+        seq(
+          ',',
+          $._expression,
+        )
+      ),
       optional(',')
     )),
 
@@ -985,11 +993,11 @@ module.exports = grammar({
       $._expression,
     ),
 
-    delim_token_tree: $ => choice(
+    delim_token_tree: $ => prec.dynamic(0, choice(
       seq('(', repeat($._delim_tokens), ')'),
       seq('[', repeat($._delim_tokens), ']'),
       seq('{', repeat($._delim_tokens), '}')
-    ),
+    )),
 
     _delim_tokens: $ => choice(
       $._non_delim_token,

@@ -2641,25 +2641,6 @@
     },
     "children": {
       "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "macro_invocation_contents",
-          "named": true
-        },
-        {
-          "type": "token_tree",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "macro_invocation_contents",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
       "required": false,
       "types": [
         {
@@ -2668,6 +2649,10 @@
         },
         {
           "type": "expressions",
+          "named": true
+        },
+        {
+          "type": "token_tree",
           "named": true
         }
       ]

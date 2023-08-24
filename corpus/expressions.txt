@@ -721,7 +721,7 @@ let msg = match x {
           pattern: (match_pattern
             (macro_invocation
               macro: (identifier)
-              (macro_invocation_contents
+              (expressions
                 (integer_literal))))
           value: (string_literal))
         (match_arm
@@ -1076,8 +1076,7 @@ Scoped functions with macros as types
       (scoped_identifier
         (bracketed_type
           (macro_invocation
-            (identifier)
-            (macro_invocation_contents)))
+            (identifier)))
         (identifier))
       (arguments))))
 
