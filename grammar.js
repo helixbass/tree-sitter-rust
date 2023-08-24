@@ -77,6 +77,39 @@ module.exports = grammar({
     [$.parameters, $._pattern],
     [$.parameters, $.tuple_struct_pattern],
     [$.type_parameters, $.for_lifetimes],
+    [$.parseable_macro_invocation_contents, $.delim_token_tree],
+    [$._expression_except_range, $._non_delim_token],
+    [$.loop_label, $._non_delim_token],
+    [$.async_block, $._non_delim_token],
+    [$.break_expression, $._non_delim_token],
+    [$.const_block, $._non_delim_token],
+    [$.continue_expression, $._non_delim_token],
+    [$.for_expression, $._non_delim_token],
+    [$.if_expression, $._non_delim_token],
+    [$.loop_expression, $._non_delim_token],
+    [$.match_expression, $._non_delim_token],
+    [$.return_expression, $._non_delim_token],
+    [$.unsafe_block, $._non_delim_token],
+    [$.while_expression, $._non_delim_token],
+    [$.struct_expression, $._non_delim_token],
+    [$.unit_expression, $.delim_token_tree],
+    [$.block, $.delim_token_tree],
+    [$.function_modifiers, $._non_delim_token],
+    [$.const_item, $._non_delim_token],
+    [$.enum_item, $._non_delim_token],
+    [$.function_item, $.function_signature_item, $._non_delim_token],
+    [$.impl_item, $._non_delim_token],
+    [$.let_declaration, $._non_delim_token],
+    [$.mod_item, $._non_delim_token],
+    [$.visibility_modifier, $._non_delim_token],
+    [$.static_item, $._non_delim_token],
+    [$.struct_item, $._non_delim_token],
+    [$.trait_item, $._non_delim_token],
+    [$.type_item, $.associated_type, $._non_delim_token],
+    [$.union_item, $._non_delim_token],
+    [$.use_declaration, $._non_delim_token],
+    [$.array_expression, $.delim_token_tree],
+    [$.expressions, $._expression_or_arrow_separated_pair],
   ],
 
   word: $ => $.identifier,
@@ -889,31 +922,67 @@ module.exports = grammar({
         $._reserved_identifier,
       )),
       '!',
-      $.macro_invocation_contents,
-    ),
-
-    macro_invocation_contents: $ => choice(
-      $._macro_invocation_contents_parentheses,
-      $._macro_invocation_contents_square_brackets,
-      seq('{', repeat($._delim_tokens), '}'),
-    ),
-
-    _macro_invocation_contents_square_brackets: $ => seq(
-      '[',
-      seq(
-        sepBy(',', $._expression),
-        optional(',')
+      choice(
+        alias($.parseable_macro_invocation_contents, $.macro_invocation_contents),
+        alias($.delim_token_tree, $.token_tree),
       ),
-      ']'
     ),
 
-    _macro_invocation_contents_parentheses: $ => seq(
-      '(',
+    parseable_macro_invocation_contents: $ => choice(
       seq(
-        sepBy(',', $._expression),
-        optional(',')
+        '[',
+        optional(choice(
+          $.arrow_separated_pairs,
+          $.expressions,
+        )),
+        ']'
       ),
-      ')'
+      seq(
+        '(',
+        optional(choice(
+          $.arrow_separated_pairs,
+          $.expressions,
+        )),
+        ')'
+      ),
+      seq(
+        '{',
+        optional(choice(
+          $.arrow_separated_pairs,
+          $.expressions,
+        )),
+        '}'
+      ),
+    ),
+
+    arrow_separated_pairs: $ => prec.dynamic(9, seq(
+      $._expression_or_arrow_separated_pair,
+      ',',
+      sepBy(',', $._expression_or_arrow_separated_pair),
+      optional(',')
+    )),
+
+    expressions: $ => prec.dynamic(10, seq(
+      $._expression,
+      ',',
+      sepBy(',', $._expression),
+      optional(',')
+    )),
+
+    _expression_or_arrow_separated_pair: $ => choice(
+      $.arrow_separated_pair,
+      $._expression,
+    ),
+
+    arrow_separated_pair: $ => seq(
+      $._expression,
+      '=>',
+      $._expression,
+    ),
+
+    _expression_or_arrow_separated_pair: $ => choice(
+      $.arrow_separated_pair,
+      $._expression,
     ),
 
     delim_token_tree: $ => choice(
