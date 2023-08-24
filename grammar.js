@@ -925,20 +925,21 @@ module.exports = grammar({
       )),
       '!',
       choice(
-        $._parseable_macro_invocation_contents,
+        prec.dynamic(1, $._parseable_macro_invocation_contents),
         alias($.delim_token_tree, $.token_tree),
       ),
     ),
 
-    _parseable_macro_invocation_contents: $ => prec.dynamic(10, choice(
+    _parseable_macro_invocation_contents: $ => choice(
       $.arrow_separated_pairs,
-      $.expressions,
-    )),
+      prec.dynamic(1, $.expressions),
+    ),
 
-    arrow_separated_pairs: $ => prec.dynamic(10, choice(
+    arrow_separated_pairs: $ => choice(
       $._arrow_separated_pairs_parens,
-      $._arrow_separated_pairs_braces_or_brackets,
-    )),
+      $._arrow_separated_pairs_curly_braces,
+      $._arrow_separated_pairs_square_brackets,
+    ),
 
     _arrow_separated_pairs_parens: $ => seq(
       '(',
@@ -946,12 +947,7 @@ module.exports = grammar({
       ')'
     ),
 
-    _arrow_separated_pairs_braces_or_brackets: $ => choice(
-      seq(
-        '[',
-        $._arrow_separated_pairs_inner,
-        ']'
-      ),
+    _arrow_separated_pairs_curly_braces: $ => choice(
       seq(
         '{',
         $._arrow_separated_pairs_inner,
@@ -959,25 +955,15 @@ module.exports = grammar({
       ),
     ),
 
-    arrow_separated_pairs: $ => prec.dynamic(10, choice(
+    _arrow_separated_pairs_square_brackets: $ => choice(
       seq(
         '[',
         $._arrow_separated_pairs_inner,
         ']'
       ),
-      seq(
-        '(',
-        $._arrow_separated_pairs_inner,
-        ')'
-      ),
-      seq(
-        '{',
-        $._arrow_separated_pairs_inner,
-        '}'
-      ),
-    )),
+    ),
 
-    expressions: $ => prec.dynamic(10, choice(
+    expressions: $ => choice(
       seq(
         '[',
         optional(
@@ -999,9 +985,9 @@ module.exports = grammar({
       //   ),
       //   '}'
       // ),
-    )),
+    ),
 
-    _arrow_separated_pairs_inner: $ => prec.dynamic(9, seq(
+    _arrow_separated_pairs_inner: $ => prec.dynamic(1, seq(
       $._expression_or_arrow_separated_pair,
       repeat(
         seq(
@@ -1012,7 +998,7 @@ module.exports = grammar({
       optional(',')
     )),
 
-    _expressions_inner: $ => prec.dynamic(10, seq(
+    _expressions_inner: $ => prec.dynamic(2, seq(
       $._expression,
       repeat(
         seq(
@@ -1035,15 +1021,35 @@ module.exports = grammar({
     ),
 
     _expression_or_arrow_separated_pairs: $ => choice(
-      alias($._arrow_separated_pairs_braces_or_brackets, $.arrow_separated_pairs),
-      $._expression,
+      prec.dynamic(4, $._expression),
+      $.arrow_separated_pairs_list,
+      alias(
+        choice(
+          $._arrow_separated_pairs_curly_braces,
+          $._arrow_separated_pairs_square_brackets,
+        ),
+        $.arrow_separated_pairs
+      ),
     ),
 
-    delim_token_tree: $ => prec.dynamic(0, choice(
+    arrow_separated_pairs_list: $ => seq(
+      '[',
+      $._arrow_separated_pairs_curly_braces,
+      repeat(
+        seq(
+          ',',
+          $._arrow_separated_pairs_curly_braces,
+        ),
+      ),
+      optional(','),
+      ']',
+    ),
+
+    delim_token_tree: $ => choice(
       seq('(', repeat($._delim_tokens), ')'),
       seq('[', repeat($._delim_tokens), ']'),
       seq('{', repeat($._delim_tokens), '}')
-    )),
+    ),
 
     _delim_tokens: $ => choice(
       $._non_delim_token,

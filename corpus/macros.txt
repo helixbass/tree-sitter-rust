@@ -335,6 +335,41 @@ nested_arrow_separated_pairs! {
     another_key => value(),
 }
 
+list_of_arrow_separated_pairs_value! {
+    key => [{nested_key => nested_value}],
+}
+
+rule! {
+    name => "no-debugger",
+    languages => [Javascript],
+    messages => [
+        unexpected => "Unexpected 'debugger' statement.",
+    ],
+    listeners => [
+        r#"(
+          (debugger_statement) @c
+        )"# => |node, context| {
+            context.report(violation! {
+                node => node,
+                message_id => "unexpected",
+            });
+        },
+    ],
+}
+
+rule_tests! {
+    valid => [
+        "var test = { debugger: 1 }; test.debugger;"
+    ],
+    invalid => [
+        {
+            code => "if (foo) debugger",
+            output => None,
+            errors => [{ message_id => "unexpected", type => "debugger_statement" }]
+        }
+    ]
+}
+
 --------------------------------------------------------------------------------
 
 (source_file
@@ -364,4 +399,79 @@ nested_arrow_separated_pairs! {
         (identifier)
         (call_expression
           (identifier)
-          (arguments))))))
+          (arguments)))))
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs_list
+              (arrow_separated_pair
+                (identifier)
+                (identifier))))))
+      (macro_invocation
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (identifier)
+        (string_literal))
+      (arrow_separated_pair
+        (identifier)
+        (array_expression
+          (identifier)))
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (identifier)
+            (string_literal))))
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (raw_string_literal)
+            (closure_expression
+              (closure_parameters
+                (identifier)
+                (identifier))
+              (block
+                (expression_statement
+                  (call_expression
+                    (field_expression
+                      (identifier)
+                      (field_identifier))
+                    (arguments
+                      (macro_invocation
+                        (identifier)
+                        (arrow_separated_pairs
+                          (arrow_separated_pair
+                            (identifier)
+                            (identifier))
+                          (arrow_separated_pair
+                            (identifier)
+                            (string_literal))))))))))))))
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (array_expression
+          (string_literal)))
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs_list
+          (arrow_separated_pair
+            (identifier)
+            (string_literal))
+          (arrow_separated_pair
+            (identifier)
+            (identifier))
+          (arrow_separated_pair
+            (identifier)
+            (arrow_separated_pairs_list
+              (arrow_separated_pair
+                (identifier)
+                (string_literal))
+              (arrow_separated_pair
+                (identifier)
+                (string_literal)))))))))
