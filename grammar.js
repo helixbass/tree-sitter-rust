@@ -111,7 +111,8 @@ module.exports = grammar({
     [$.array_expression, $.delim_token_tree],
     [$._expressions_inner, $._expression_or_arrow_separated_pair],
     [$.block, $._expression_or_arrow_separated_pair],
-    [$.array_expression, $._expression_or_arrow_separated_pair],
+    [$.array_expression, $._expression_or_arrow_separated_pairs_curly_braces],
+    [$._expression_or_arrow_separated_pairs_curly_braces, $.arrow_separated_pairs_list],
   ],
 
   word: $ => $.identifier,
@@ -1017,28 +1018,42 @@ module.exports = grammar({
     arrow_separated_pair: $ => seq(
       field('key', $._expression),
       '=>',
-      field('value', $._expression_or_arrow_separated_pairs),
+      field('value', $._expression_or_arrow_separated_pairs_curly_braces_or_arrow_separated_pairs_list),
     ),
 
-    _expression_or_arrow_separated_pairs: $ => choice(
+    _expression_or_arrow_separated_pairs_curly_braces_or_arrow_separated_pairs_list: $ => choice(
       prec.dynamic(4, $._expression),
       $.arrow_separated_pairs_list,
       alias(
-        choice(
-          $._arrow_separated_pairs_curly_braces,
-          $._arrow_separated_pairs_square_brackets,
-        ),
+        $._arrow_separated_pairs_curly_braces,
+        $.arrow_separated_pairs
+      ),
+    ),
+
+    _expression_or_arrow_separated_pairs_curly_braces: $ => choice(
+      prec.dynamic(4, $._expression),
+      alias(
+        $._arrow_separated_pairs_curly_braces,
         $.arrow_separated_pairs
       ),
     ),
 
     arrow_separated_pairs_list: $ => seq(
       '[',
-      $._arrow_separated_pairs_curly_braces,
+      repeat(
+        seq(
+          $._expression_or_arrow_separated_pairs_curly_braces,
+          ',',
+        ),
+      ),
+      alias(
+        $._arrow_separated_pairs_curly_braces,
+        $.arrow_separated_pairs
+      ),
       repeat(
         seq(
           ',',
-          $._arrow_separated_pairs_curly_braces,
+          $._expression_or_arrow_separated_pairs_curly_braces,
         ),
       ),
       optional(','),

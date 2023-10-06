@@ -617,14 +617,14 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "_expression",
           "named": true
         },
         {
-          "type": "arrow_separated_pair",
+          "type": "arrow_separated_pairs",
           "named": true
         }
       ]

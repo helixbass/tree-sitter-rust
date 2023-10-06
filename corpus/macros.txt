@@ -342,10 +342,10 @@ list_of_arrow_separated_pairs_value! {
 rule! {
     name => "no-debugger",
     languages => [Javascript],
-    messages => [
+    messages => {
         unexpected => "Unexpected 'debugger' statement.",
-    ],
-    listeners => [
+    },
+    listeners => {
         r#"(
           (debugger_statement) @c
         )"# => |node, context| {
@@ -354,7 +354,7 @@ rule! {
                 message_id => "unexpected",
             });
         },
-    ],
+    },
 }
 
 rule_tests! {
@@ -368,6 +368,18 @@ rule_tests! {
             errors => [{ message_id => "unexpected", type => "debugger_statement" }]
         }
     ]
+}
+
+fn whee() {
+    RuleTester::run_with_from_file_run_context_instance_provider(
+        rule_tests! {
+            valid => [
+                "whee",
+                { code => "function f() { b; }", environment => { globals => { b => false } } },
+                { code => "function f() { b; }", environment => { globals => { b => false } } },
+            ],
+        }
+    )
 }
 
 --------------------------------------------------------------------------------
@@ -406,9 +418,10 @@ rule_tests! {
       (arrow_separated_pair
         (identifier)
         (arrow_separated_pairs_list
-              (arrow_separated_pair
-                (identifier)
-                (identifier))))))
+          (arrow_separated_pairs
+            (arrow_separated_pair
+              (identifier)
+              (identifier)))))))
       (macro_invocation
         (identifier)
         (arrow_separated_pairs
@@ -460,18 +473,63 @@ rule_tests! {
       (arrow_separated_pair
         (identifier)
         (arrow_separated_pairs_list
-          (arrow_separated_pair
+          (arrow_separated_pairs
+            (arrow_separated_pair
+              (identifier)
+              (string_literal))
+            (arrow_separated_pair
+              (identifier)
+              (identifier))
+            (arrow_separated_pair
+              (identifier)
+              (arrow_separated_pairs_list
+                (arrow_separated_pairs
+                  (arrow_separated_pair
+                    (identifier)
+                    (string_literal))
+                  (arrow_separated_pair
+                    (identifier)
+                    (string_literal)))
+                )))))))
+  (function_item
+    (identifier)
+    (parameters)
+    (block
+      (call_expression
+        (scoped_identifier
+          (identifier)
+          (identifier))
+        (arguments
+          (macro_invocation
             (identifier)
-            (string_literal))
-          (arrow_separated_pair
-            (identifier)
-            (identifier))
-          (arrow_separated_pair
-            (identifier)
-            (arrow_separated_pairs_list
+            (arrow_separated_pairs
               (arrow_separated_pair
                 (identifier)
-                (string_literal))
-              (arrow_separated_pair
-                (identifier)
-                (string_literal)))))))))
+                (arrow_separated_pairs_list
+                  (string_literal)
+                  (arrow_separated_pairs
+                    (arrow_separated_pair
+                      (identifier)
+                      (string_literal))
+                    (arrow_separated_pair
+                      (identifier)
+                      (arrow_separated_pairs
+                        (arrow_separated_pair
+                          (identifier)
+                          (arrow_separated_pairs
+                            (arrow_separated_pair
+                              (identifier)
+                              (boolean_literal)))))))
+                  (arrow_separated_pairs
+                    (arrow_separated_pair
+                      (identifier)
+                      (string_literal))
+                    (arrow_separated_pair
+                      (identifier)
+                      (arrow_separated_pairs
+                        (arrow_separated_pair
+                          (identifier)
+                          (arrow_separated_pairs
+                            (arrow_separated_pair
+                              (identifier)
+                              (boolean_literal))))))))))))))))
