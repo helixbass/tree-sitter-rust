@@ -561,24 +561,35 @@
   {
     "type": "arrow_separated_pair",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "arrow_separated_pairs",
-          "named": true
-        },
-        {
-          "type": "arrow_separated_pairs_list",
-          "named": true
-        }
-      ]
+    "fields": {
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "arrow_separated_pairs",
+            "named": true
+          },
+          {
+            "type": "arrow_separated_pairs_list",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {

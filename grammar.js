@@ -1015,9 +1015,9 @@ module.exports = grammar({
     ),
 
     arrow_separated_pair: $ => seq(
-      $._expression,
+      field('key', $._expression),
       '=>',
-      $._expression_or_arrow_separated_pairs,
+      field('value', $._expression_or_arrow_separated_pairs),
     ),
 
     _expression_or_arrow_separated_pairs: $ => choice(
