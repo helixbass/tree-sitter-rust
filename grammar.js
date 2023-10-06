@@ -77,6 +77,42 @@ module.exports = grammar({
     [$.parameters, $._pattern],
     [$.parameters, $.tuple_struct_pattern],
     [$.type_parameters, $.for_lifetimes],
+    [$.expressions, $.delim_token_tree],
+    [$._expression_except_range, $._non_delim_token],
+    [$.loop_label, $._non_delim_token],
+    [$.async_block, $._non_delim_token],
+    [$.break_expression, $._non_delim_token],
+    [$.const_block, $._non_delim_token],
+    [$.continue_expression, $._non_delim_token],
+    [$.for_expression, $._non_delim_token],
+    [$.if_expression, $._non_delim_token],
+    [$.loop_expression, $._non_delim_token],
+    [$.match_expression, $._non_delim_token],
+    [$.return_expression, $._non_delim_token],
+    [$.unsafe_block, $._non_delim_token],
+    [$.while_expression, $._non_delim_token],
+    [$.struct_expression, $._non_delim_token],
+    [$.unit_expression, $.delim_token_tree],
+    [$.block, $.delim_token_tree],
+    [$.function_modifiers, $._non_delim_token],
+    [$.const_item, $._non_delim_token],
+    [$.enum_item, $._non_delim_token],
+    [$.function_item, $.function_signature_item, $._non_delim_token],
+    [$.impl_item, $._non_delim_token],
+    [$.let_declaration, $._non_delim_token],
+    [$.mod_item, $._non_delim_token],
+    [$.visibility_modifier, $._non_delim_token],
+    [$.static_item, $._non_delim_token],
+    [$.struct_item, $._non_delim_token],
+    [$.trait_item, $._non_delim_token],
+    [$.type_item, $.associated_type, $._non_delim_token],
+    [$.union_item, $._non_delim_token],
+    [$.use_declaration, $._non_delim_token],
+    [$.array_expression, $.delim_token_tree],
+    [$._expressions_inner, $._expression_or_arrow_separated_pair],
+    [$.block, $._expression_or_arrow_separated_pair],
+    [$.array_expression, $._expression_or_arrow_separated_pairs_curly_braces],
+    [$._expression_or_arrow_separated_pairs_curly_braces, $.arrow_separated_pairs_list],
   ],
 
   word: $ => $.identifier,
@@ -889,7 +925,139 @@ module.exports = grammar({
         $._reserved_identifier,
       )),
       '!',
-      alias($.delim_token_tree, $.token_tree)
+      choice(
+        prec.dynamic(1, $._parseable_macro_invocation_contents),
+        alias($.delim_token_tree, $.token_tree),
+      ),
+    ),
+
+    _parseable_macro_invocation_contents: $ => choice(
+      $.arrow_separated_pairs,
+      prec.dynamic(1, $.expressions),
+    ),
+
+    arrow_separated_pairs: $ => choice(
+      $._arrow_separated_pairs_parens,
+      $._arrow_separated_pairs_curly_braces,
+      $._arrow_separated_pairs_square_brackets,
+    ),
+
+    _arrow_separated_pairs_parens: $ => seq(
+      '(',
+      $._arrow_separated_pairs_inner,
+      ')'
+    ),
+
+    _arrow_separated_pairs_curly_braces: $ => choice(
+      seq(
+        '{',
+        $._arrow_separated_pairs_inner,
+        '}'
+      ),
+    ),
+
+    _arrow_separated_pairs_square_brackets: $ => choice(
+      seq(
+        '[',
+        $._arrow_separated_pairs_inner,
+        ']'
+      ),
+    ),
+
+    expressions: $ => choice(
+      seq(
+        '[',
+        optional(
+          $._expressions_inner,
+        ),
+        ']'
+      ),
+      seq(
+        '(',
+        optional(
+          $._expressions_inner,
+        ),
+        ')'
+      ),
+      // seq(
+      //   '{',
+      //   optional(
+      //     $._expressions_inner,
+      //   ),
+      //   '}'
+      // ),
+    ),
+
+    _arrow_separated_pairs_inner: $ => prec.dynamic(1, seq(
+      $._expression_or_arrow_separated_pair,
+      repeat(
+        seq(
+          ',',
+          $._expression_or_arrow_separated_pair,
+        )
+      ),
+      optional(',')
+    )),
+
+    _expressions_inner: $ => prec.dynamic(2, seq(
+      $._expression,
+      repeat(
+        seq(
+          ',',
+          $._expression,
+        )
+      ),
+      optional(',')
+    )),
+
+    _expression_or_arrow_separated_pair: $ => choice(
+      $.arrow_separated_pair,
+      $._expression,
+    ),
+
+    arrow_separated_pair: $ => seq(
+      field('key', $._expression),
+      '=>',
+      field('value', $._expression_or_arrow_separated_pairs_curly_braces_or_arrow_separated_pairs_list),
+    ),
+
+    _expression_or_arrow_separated_pairs_curly_braces_or_arrow_separated_pairs_list: $ => choice(
+      prec.dynamic(4, $._expression),
+      $.arrow_separated_pairs_list,
+      alias(
+        $._arrow_separated_pairs_curly_braces,
+        $.arrow_separated_pairs
+      ),
+    ),
+
+    _expression_or_arrow_separated_pairs_curly_braces: $ => choice(
+      prec.dynamic(4, $._expression),
+      alias(
+        $._arrow_separated_pairs_curly_braces,
+        $.arrow_separated_pairs
+      ),
+    ),
+
+    arrow_separated_pairs_list: $ => seq(
+      '[',
+      repeat(
+        seq(
+          $._expression_or_arrow_separated_pairs_curly_braces,
+          ',',
+        ),
+      ),
+      alias(
+        $._arrow_separated_pairs_curly_braces,
+        $.arrow_separated_pairs
+      ),
+      repeat(
+        seq(
+          ',',
+          $._expression_or_arrow_separated_pairs_curly_braces,
+        ),
+      ),
+      optional(','),
+      ']',
     ),
 
     delim_token_tree: $ => choice(

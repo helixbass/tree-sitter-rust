@@ -559,6 +559,78 @@
     }
   },
   {
+    "type": "arrow_separated_pair",
+    "named": true,
+    "fields": {
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "arrow_separated_pairs",
+            "named": true
+          },
+          {
+            "type": "arrow_separated_pairs_list",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "arrow_separated_pairs",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "arrow_separated_pair",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "arrow_separated_pairs_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "arrow_separated_pairs",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "assignment_expression",
     "named": true,
     "fields": {
@@ -1568,6 +1640,21 @@
     "children": {
       "multiple": false,
       "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "expressions",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
       "types": [
         {
           "type": "_expression",
@@ -2594,6 +2681,14 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "arrow_separated_pairs",
+          "named": true
+        },
+        {
+          "type": "expressions",
+          "named": true
+        },
         {
           "type": "token_tree",
           "named": true

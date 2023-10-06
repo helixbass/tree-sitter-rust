@@ -14,11 +14,11 @@ f::g::h!{};
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree)))
+      (expressions)))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree)))
+      (expressions)))
   (expression_statement
     (macro_invocation
       (identifier)
@@ -28,7 +28,7 @@ f::g::h!{};
       (scoped_identifier
         (identifier)
         (identifier))
-      (token_tree)))
+      (expressions)))
   (expression_statement
     (macro_invocation
       (scoped_identifier
@@ -63,36 +63,46 @@ a!($a $a:ident $($a);*);
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier))))
+      (expressions
+        (unary_expression
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier))))
+      (expressions
+        (reference_expression
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier))))
+      (expressions
+        (unary_expression
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (identifier)
-        (identifier))))
+      (expressions
+        (binary_expression
+          (identifier)
+          (identifier))
+        (ERROR))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (char_literal)
-        (char_literal))))
+          (expressions
+            (range_expression
+              (char_literal)
+              (char_literal)))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
-        (char_literal)
-        (char_literal))))
+      (expressions
+        (range_expression
+          (char_literal)
+          (char_literal)))))
   (macro_invocation
     (identifier)
     (token_tree
@@ -100,12 +110,12 @@ a!($a $a:ident $($a);*);
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
+      (expressions
         (identifier))))
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree
+      (expressions
         (identifier))))
   (expression_statement
     (macro_invocation
@@ -114,22 +124,28 @@ a!($a $a:ident $($a);*);
   (expression_statement
     (macro_invocation
       (identifier)
-      (token_tree (token_tree))))
-  (expression_statement
-    (macro_invocation
-      (identifier)
-      (token_tree (identifier))))
-  (expression_statement
-    (macro_invocation
-      (identifier)
-      (token_tree (token_tree (token_tree (token_tree (identifier)))))))
+      (token_tree
+        (token_tree))))
   (expression_statement
     (macro_invocation
       (identifier)
       (token_tree
-        (identifier)
-        (identifier)
-        (identifier)
+        (identifier))))
+  (expression_statement
+    (macro_invocation
+      (identifier)
+      (token_tree
+        (token_tree
+          (token_tree
+            (token_tree
+              (identifier)))))))
+  (expression_statement
+    (macro_invocation
+      (identifier)
+      (token_tree
+        (ERROR
+          (metavariable)
+          (metavariable))
         (token_tree
           (identifier))))))
 
@@ -148,8 +164,8 @@ ok! {
   (macro_invocation
     (identifier)
     (token_tree
-      (line_comment)
-      (block_comment))))
+    (line_comment)
+    (block_comment))))
 
 ================================================================================
 Macro definition
@@ -255,3 +271,265 @@ macro_rules! zero_or_one {
       right: (token_tree
         (token_repetition
           (metavariable))))))
+
+================================================================================
+Macro invocation - expression "arguments"
+================================================================================
+
+println!(some.method(), a + b);
+let x = vec![
+  some_function(and, args),
+  nested!(here.they(are)),
+];
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (expression_statement
+    (macro_invocation
+      (identifier)
+      (expressions
+        (call_expression
+          (field_expression
+            (identifier)
+            (field_identifier))
+          (arguments))
+        (binary_expression
+          (identifier)
+          (identifier)))))
+  (let_declaration
+    (identifier)
+    (macro_invocation
+      (identifier)
+      (expressions
+        (call_expression
+          (identifier)
+          (arguments
+            (identifier)
+            (identifier)))
+        (macro_invocation
+          (identifier)
+          (expressions
+            (call_expression
+              (field_expression
+                (identifier)
+                (field_identifier))
+              (arguments
+                (identifier)))))))))
+
+================================================================================
+Macro invocation - arrow-separated pairs
+================================================================================
+
+foo! {
+    key => "value",
+    shorthand,
+    another_key => value(),
+}
+
+nested_arrow_separated_pairs! {
+    key => {
+        nested_key => nested_value,
+    },
+    shorthand,
+    another_key => value(),
+}
+
+list_of_arrow_separated_pairs_value! {
+    key => [{nested_key => nested_value}],
+}
+
+rule! {
+    name => "no-debugger",
+    languages => [Javascript],
+    messages => {
+        unexpected => "Unexpected 'debugger' statement.",
+    },
+    listeners => {
+        r#"(
+          (debugger_statement) @c
+        )"# => |node, context| {
+            context.report(violation! {
+                node => node,
+                message_id => "unexpected",
+            });
+        },
+    },
+}
+
+rule_tests! {
+    valid => [
+        "var test = { debugger: 1 }; test.debugger;"
+    ],
+    invalid => [
+        {
+            code => "if (foo) debugger",
+            output => None,
+            errors => [{ message_id => "unexpected", type => "debugger_statement" }]
+        }
+    ]
+}
+
+fn whee() {
+    RuleTester::run_with_from_file_run_context_instance_provider(
+        rule_tests! {
+            valid => [
+                "whee",
+                { code => "function f() { b; }", environment => { globals => { b => false } } },
+                { code => "function f() { b; }", environment => { globals => { b => false } } },
+            ],
+        }
+    )
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (string_literal))
+      (identifier)
+      (arrow_separated_pair
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (identifier)
+            (identifier))))
+      (identifier)
+      (arrow_separated_pair
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs_list
+          (arrow_separated_pairs
+            (arrow_separated_pair
+              (identifier)
+              (identifier)))))))
+      (macro_invocation
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (identifier)
+        (string_literal))
+      (arrow_separated_pair
+        (identifier)
+        (array_expression
+          (identifier)))
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (identifier)
+            (string_literal))))
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs
+          (arrow_separated_pair
+            (raw_string_literal)
+            (closure_expression
+              (closure_parameters
+                (identifier)
+                (identifier))
+              (block
+                (expression_statement
+                  (call_expression
+                    (field_expression
+                      (identifier)
+                      (field_identifier))
+                    (arguments
+                      (macro_invocation
+                        (identifier)
+                        (arrow_separated_pairs
+                          (arrow_separated_pair
+                            (identifier)
+                            (identifier))
+                          (arrow_separated_pair
+                            (identifier)
+                            (string_literal))))))))))))))
+  (macro_invocation
+    (identifier)
+    (arrow_separated_pairs
+      (arrow_separated_pair
+        (identifier)
+        (array_expression
+          (string_literal)))
+      (arrow_separated_pair
+        (identifier)
+        (arrow_separated_pairs_list
+          (arrow_separated_pairs
+            (arrow_separated_pair
+              (identifier)
+              (string_literal))
+            (arrow_separated_pair
+              (identifier)
+              (identifier))
+            (arrow_separated_pair
+              (identifier)
+              (arrow_separated_pairs_list
+                (arrow_separated_pairs
+                  (arrow_separated_pair
+                    (identifier)
+                    (string_literal))
+                  (arrow_separated_pair
+                    (identifier)
+                    (string_literal)))
+                )))))))
+  (function_item
+    (identifier)
+    (parameters)
+    (block
+      (call_expression
+        (scoped_identifier
+          (identifier)
+          (identifier))
+        (arguments
+          (macro_invocation
+            (identifier)
+            (arrow_separated_pairs
+              (arrow_separated_pair
+                (identifier)
+                (arrow_separated_pairs_list
+                  (string_literal)
+                  (arrow_separated_pairs
+                    (arrow_separated_pair
+                      (identifier)
+                      (string_literal))
+                    (arrow_separated_pair
+                      (identifier)
+                      (arrow_separated_pairs
+                        (arrow_separated_pair
+                          (identifier)
+                          (arrow_separated_pairs
+                            (arrow_separated_pair
+                              (identifier)
+                              (boolean_literal)))))))
+                  (arrow_separated_pairs
+                    (arrow_separated_pair
+                      (identifier)
+                      (string_literal))
+                    (arrow_separated_pair
+                      (identifier)
+                      (arrow_separated_pairs
+                        (arrow_separated_pair
+                          (identifier)
+                          (arrow_separated_pairs
+                            (arrow_separated_pair
+                              (identifier)
+                              (boolean_literal))))))))))))))))
